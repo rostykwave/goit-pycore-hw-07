@@ -26,9 +26,19 @@ class Phone(Field):
 class Birthday(Field):
     def __init__(self, value):
         try:
-            self.value = datetime.strptime(value, "%d.%m.%Y").date()
+            parsed_date = datetime.strptime(value, "%d.%m.%Y").date()
         except ValueError:
             raise ValueError("Invalid date format. Use DD.MM.YYYY")
+        
+        if Birthday.is_future_date(parsed_date):
+            raise ValueError("Birthday is in the future")
+        
+        self.value = parsed_date
+    
+    
+    @staticmethod
+    def is_future_date(date):
+        return date > datetime.today().date()
         
 class Record:
     def __init__(self, name):
@@ -103,7 +113,7 @@ if __name__ == "__main__":
     john_record = Record("John")
     john_record.add_phone("1234567890")
     john_record.add_phone("5555555555")
-    john_record.add_birthday("15.03.1995")
+    john_record.add_birthday("18.03.1995")
 
     # Додавання запису John до адресної книги
     book.add_record(john_record)
