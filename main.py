@@ -71,10 +71,14 @@ class Record:
         self.birthday = None
 
     def add_phone(self, phone_number):
-         self.phones.append(Phone(phone_number))
+        if phone_number in [p.value for p in self.phones]:
+            raise ValueError("This phone number is already added.")
+        self.phones.append(Phone(phone_number))
 
     def remove_phone(self, phone_number):
-         self.phones = [phone for phone in self.phones if phone.value != phone_number]
+        if phone_number not in [p.value for p in self.phones]:
+            raise ValueError("Phone number not found.")
+        self.phones = [phone for phone in self.phones if phone.value != phone_number]
 
     def edit_phone(self, old_phone, new_phone):
         for phone in self.phones:
@@ -90,6 +94,8 @@ class Record:
         return "; ".join(phone.value for phone in self.phones) if self.phones else "No phone numbers"
     
     def add_birthday(self, birthday):
+        if self.birthday:
+            raise ValueError("Birthday is already set and cannot be changed.")
         self.birthday = Birthday(birthday)
 
     def show_birthday(self):
@@ -135,7 +141,10 @@ class AddressBook(UserDict):
         return upcoming_birthdays
     
     def list_all_contacts(self):
-        return {name: record.get_phones() for name, record in self.data.items()}
+        # return {name: record.get_phones() for name, record in self.data.items()}
+        if not self.data:
+            return "No contacts in the address book."
+        return "\n".join(f"{name}: {record.get_phones()}" for name, record in self.data.items())
        
 @input_error
 def add_contact(args, book: AddressBook):
